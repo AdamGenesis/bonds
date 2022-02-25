@@ -7,14 +7,14 @@ import "./libraries/SafeERC20.sol";
 import "./interfaces/IOwnable.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IERC20Metadata.sol";
-import "./interfaces/IOHM.sol";
-import "./interfaces/IsOHM.sol";
+import "./interfaces/IGenesisToken.sol";
+import "./interfaces/IStakedGenesisToken.sol";
 import "./interfaces/IBondingCalculator.sol";
 import "./interfaces/ITreasury.sol";
 
-import "./types/OlympusAccessControlled.sol";
+import "./types/AccessControlled.sol";
 
-contract Treasury is OlympusAccessControlled, ITreasury {
+contract Treasury is AccessControlled, ITreasury {
     /* ========== DEPENDENCIES ========== */
 
     using SafeMath for uint256;
@@ -59,8 +59,8 @@ contract Treasury is OlympusAccessControlled, ITreasury {
 
     /* ========== STATE VARIABLES ========== */
 
-    IOHM public immutable OHM;
-    IsOHM public sOHM;
+    IGenesisToken public immutable OHM;
+    IStakedGenesisToken public sOHM;
 
     mapping(STATUS => address[]) public registry;
     mapping(STATUS => mapping(address => bool)) public permissions;
@@ -91,9 +91,9 @@ contract Treasury is OlympusAccessControlled, ITreasury {
         address _ohm,
         uint256 _timelock,
         address _authority
-    ) OlympusAccessControlled(IOlympusAuthority(_authority)) {
+    ) AccessControlled(IAuthority(_authority)) {
         require(_ohm != address(0), "Zero address: OHM");
-        OHM = IOHM(_ohm);
+        OHM = IGenesisToken(_ohm);
 
         timelockEnabled = false;
         initialized = false;
@@ -306,7 +306,7 @@ contract Treasury is OlympusAccessControlled, ITreasury {
     ) external onlyGovernor {
         require(timelockEnabled == false, "Use queueTimelock");
         if (_status == STATUS.SOHM) {
-            sOHM = IsOHM(_address);
+            sOHM = IStakedGenesisToken(_address);
         } else {
             permissions[_status][_address] = true;
 
@@ -409,7 +409,7 @@ contract Treasury is OlympusAccessControlled, ITreasury {
 
         if (info.managing == STATUS.SOHM) {
             // 9
-            sOHM = IsOHM(info.toPermit);
+            sOHM = IStakedGenesisToken(info.toPermit);
         } else {
             permissions[info.managing][info.toPermit] = true;
 

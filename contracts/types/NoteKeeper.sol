@@ -3,7 +3,7 @@ pragma solidity ^0.8.10;
 
 import "../types/FrontEndRewarder.sol";
 
-import "../interfaces/IgOHM.sol";
+import "../interfaces/IGovernanceGenesisToken.sol";
 import "../interfaces/IStaking.sol";
 import "../interfaces/ITreasury.sol";
 import "../interfaces/INoteKeeper.sol";
@@ -12,14 +12,14 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
     mapping(address => Note[]) public notes; // user deposit data
     mapping(address => mapping(uint256 => address)) private noteTransfers; // change note ownership
 
-    IgOHM internal immutable gOHM;
+    IGovernanceGenesisToken internal immutable gOHM;
     IStaking internal immutable staking;
     ITreasury internal treasury;
 
     constructor(
-        IOlympusAuthority _authority,
+        IAuthority _authority,
         IERC20 _ohm,
-        IgOHM _gohm,
+        IGovernanceGenesisToken _gohm,
         IStaking _staking,
         ITreasury _treasury
     ) FrontEndRewarder(_authority, _ohm) {

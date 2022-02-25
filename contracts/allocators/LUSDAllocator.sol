@@ -8,14 +8,14 @@ import "../interfaces/ITreasury.sol";
 import "./interfaces/ISwapRouter.sol";
 import "./interfaces/IWETH.sol";
 import "./interfaces/LiquityInterfaces.sol";
-import "../types/OlympusAccessControlled.sol";
+import "../types/AccessControlled.sol";
 
 /**
  *  Contract deploys reserves from treasury into the liquity stabilty pool, and those rewards
  *  are then paid out to the staking contract.  See harvest() function for more details.
  */
 
-contract LUSDAllocator is OlympusAccessControlled {
+contract LUSDAllocator is AccessControlled {
     /* ======== DEPENDENCIES ======== */
 
     using SafeERC20 for IERC20;
@@ -71,7 +71,7 @@ contract LUSDAllocator is OlympusAccessControlled {
         address _wethAddress,
         address _hopTokenAddress,
         address _uniswapV3Router
-    ) OlympusAccessControlled(IOlympusAuthority(_authority)) {
+    ) AccessControlled(IAuthority(_authority)) {
         treasury = ITreasury(_treasury);
         lusdTokenAddress = _lusdTokenAddress;
         lqtyTokenAddress = _lqtyTokenAddress;
@@ -130,7 +130,7 @@ contract LUSDAllocator is OlympusAccessControlled {
 
     /**
      *  @notice claims LQTY & ETH Rewards.   minETHLUSDRate minimum rate of when swapping ETH->LUSD.  e.g. 3500 means we swap at a rate of 1 ETH for a minimum 3500 LUSD
-     
+
         1.  Harvest from LUSD StabilityPool to get ETH+LQTY rewards
         2.  Stake LQTY rewards from #1.  This txn will also give out any outstanding ETH+LUSD rewards from prior staking
         3.  If we have eth, convert to weth, then swap a percentage of it to LUSD.  If swap successul then send all remaining WETH to treasury
@@ -284,7 +284,7 @@ contract LUSDAllocator is OlympusAccessControlled {
     }
 
     /**
-    Helper method copying OlympusTreasury::_tokenValue(), whose name was 'valueOf()' in v1 
+    Helper method copying OlympusTreasury::_tokenValue(), whose name was 'valueOf()' in v1
     Implemented here so we don't have to upgrade contract later
      */
     function _tokenValue(address _token, uint256 _amount) internal view returns (uint256 value_) {

@@ -2,12 +2,12 @@
 pragma solidity ^0.8.10;
 
 import {IERC20} from "../interfaces/IERC20.sol";
-import {IgOHM} from "../interfaces/IgOHM.sol";
+import {IGovernanceGenesisToken} from "../interfaces/IGovernanceGenesisToken.sol";
 import {SafeERC20} from "../libraries/SafeERC20.sol";
 
 /**
     @title IOHMIndexWrapper
-    @notice This interface is used to wrap cross-chain oracles to feed an index without needing IsOHM, 
+    @notice This interface is used to wrap cross-chain oracles to feed an index without needing IsOHM,
     while also being able to use sOHM on mainnet.
  */
 interface IOHMIndexWrapper {
@@ -43,7 +43,7 @@ abstract contract YieldSplitter {
 
     /**
         @notice Constructor
-        @param indexWrapper_ Address of contract that will return the sOHM to gOHM index. 
+        @param indexWrapper_ Address of contract that will return the sOHM to gOHM index.
                              On mainnet this will be sOHM but on other chains can be an oracle wrapper.
     */
     constructor(address indexWrapper_) {
@@ -122,7 +122,7 @@ abstract contract YieldSplitter {
     /**
         @notice Close a deposit. Remove all information in both the deposit info, depositorIds and recipientIds.
         @param id_ Id of the deposit.
-        @dev Internally for accounting reasons principal amount is stored in 9 decimal OHM terms. 
+        @dev Internally for accounting reasons principal amount is stored in 9 decimal OHM terms.
         Since most implementations will work will gOHM, principal here is returned externally in 18 decimal gOHM terms.
         @return principal : amount of principal that was deleted. in gOHM. 18 decimals.
         @return agnosticAmount : total amount of gOHM deleted. Principal + Yield. 18 decimals.

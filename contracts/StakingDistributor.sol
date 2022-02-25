@@ -8,9 +8,9 @@ import "./interfaces/IERC20.sol";
 import "./interfaces/ITreasury.sol";
 import "./interfaces/IDistributor.sol";
 
-import "./types/OlympusAccessControlled.sol";
+import "./types/AccessControlled.sol";
 
-contract StakingDistributor is IDistributor, OlympusAccessControlled {
+contract StakingDistributor is IDistributor, AccessControlled {
     /* ========== DEPENDENCIES ========== */
 
     using SafeMath for uint256;
@@ -48,7 +48,7 @@ contract StakingDistributor is IDistributor, OlympusAccessControlled {
         address _ohm,
         address _staking,
         address _authority
-    ) OlympusAccessControlled(IOlympusAuthority(_authority)) {
+    ) AccessControlled(IAuthority(_authority)) {
         require(_treasury != address(0), "Zero address: Treasury");
         treasury = ITreasury(_treasury);
         require(_ohm != address(0), "Zero address: OHM");

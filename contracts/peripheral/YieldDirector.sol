@@ -2,18 +2,18 @@
 pragma solidity ^0.8.10;
 
 import {IERC20} from "../interfaces/IERC20.sol";
-import {IsOHM} from "../interfaces/IsOHM.sol";
+import {IStakedGenesisToken} from "../interfaces/IStakedGenesisToken.sol";
 import {SafeERC20} from "../libraries/SafeERC20.sol";
 import {IYieldDirector} from "../interfaces/IYieldDirector.sol";
-import {OlympusAccessControlled, IOlympusAuthority} from "../types/OlympusAccessControlled.sol";
+import {AccessControlled, IAuthority} from "../types/AccessControlled.sol";
 
 /**
-    @title YieldDirector (codename Tyche) 
+    @title YieldDirector (codename Tyche)
     @notice This contract allows donors to deposit their sOHM and donate their rebases
             to any address. Donors will be able to withdraw their principal
             sOHM at any time. Donation recipients can also redeem accrued rebases at any time.
  */
-contract YieldDirector is IYieldDirector, OlympusAccessControlled {
+contract YieldDirector is IYieldDirector, AccessControlled {
     using SafeERC20 for IERC20;
 
     uint256 private constant MAX_UINT256 = type(uint256).max;
@@ -49,7 +49,7 @@ contract YieldDirector is IYieldDirector, OlympusAccessControlled {
     event Redeemed(address indexed recipient_, uint256 amount_);
     event EmergencyShutdown(bool active_);
 
-    constructor(address sOhm_, address authority_) OlympusAccessControlled(IOlympusAuthority(authority_)) {
+    constructor(address sOhm_, address authority_) AccessControlled(IAuthority(authority_)) {
         require(sOhm_ != address(0), "Invalid address for sOHM");
 
         sOHM = sOhm_;
@@ -71,7 +71,7 @@ contract YieldDirector is IYieldDirector, OlympusAccessControlled {
 
         IERC20(sOHM).safeTransferFrom(msg.sender, address(this), amount_);
 
-        uint256 index = IsOHM(sOHM).index();
+        uint256 index = IStakedGenesisToken(sOHM).index();
 
         // Record donors's issued debt to recipient address
         DonationInfo[] storage donations = donationInfo[msg.sender];
@@ -114,7 +114,7 @@ contract YieldDirector is IYieldDirector, OlympusAccessControlled {
         require(!withdrawDisabled, "Withdraws currently disabled");
         require(amount_ > 0, "Invalid withdraw amount");
 
-        uint256 index = IsOHM(sOHM).index();
+        uint256 index = IStakedGenesisToken(sOHM).index();
 
         // Donor accounting
         uint256 recipientIndex = _getRecipientIndex(msg.sender, recipient_);
@@ -166,7 +166,7 @@ contract YieldDirector is IYieldDirector, OlympusAccessControlled {
         uint256 donationsLength = donations.length;
         require(donationsLength != 0, "User not donating to anything");
 
-        uint256 sOhmIndex = IsOHM(sOHM).index();
+        uint256 sOhmIndex = IStakedGenesisToken(sOHM).index();
         uint256 total = 0;
 
         for (uint256 index = 0; index < donationsLength; index++) {
@@ -292,7 +292,7 @@ contract YieldDirector is IYieldDirector, OlympusAccessControlled {
         RecipientInfo storage recipient = recipientInfo[msg.sender];
         recipient.agnosticDebt = _toAgnostic(recipient.totalDebt);
         recipient.carry = 0;
-        recipient.indexAtLastChange = IsOHM(sOHM).index();
+        recipient.indexAtLastChange = IStakedGenesisToken(sOHM).index();
 
         IERC20(sOHM).safeTransfer(msg.sender, redeemable);
 
@@ -333,7 +333,7 @@ contract YieldDirector is IYieldDirector, OlympusAccessControlled {
              1e9 is because sOHM has 9 decimals.
      */
     function _toAgnostic(uint256 amount_) internal view returns (uint256) {
-        return (amount_ * 1e9) / (IsOHM(sOHM).index());
+        return (amount_ * 1e9) / (IStakedGenesisToken(sOHM).index());
     }
 
     /**
@@ -342,7 +342,7 @@ contract YieldDirector is IYieldDirector, OlympusAccessControlled {
              1e9 is because sOHM has 9 decimals.
      */
     function _fromAgnostic(uint256 amount_) internal view returns (uint256) {
-        return (amount_ * (IsOHM(sOHM).index())) / 1e9;
+        return (amount_ * (IStakedGenesisToken(sOHM).index())) / 1e9;
     }
 
     /**
