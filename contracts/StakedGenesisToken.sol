@@ -71,8 +71,8 @@ contract StakedGenesisToken is IStakedGenesisToken, ERC20Permit {
 
     /* ========== CONSTRUCTOR ========== */
 
-    constructor() ERC20("Staked GEN", "sGEN", 9) ERC20Permit("Staked GEN") {
-        initializer = msg.sender;
+    constructor(address _initializer) ERC20("Staked GEN", "sGEN", 9) ERC20Permit("Staked GEN") {
+        initializer = _initializer;
         _totalSupply = INITIAL_FRAGMENTS_SUPPLY;
         _gonsPerFragment = TOTAL_GONS.div(_totalSupply);
     }
