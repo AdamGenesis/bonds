@@ -4,11 +4,11 @@ pragma solidity ^0.7.5;
 import "../libraries/SafeMath.sol";
 import "../libraries/Address.sol";
 
-import "../interfaces/IsOHM.sol";
-import "../interfaces/IgOHM.sol";
+import "../interfaces/IStakedGenesisToken.sol";
+import "../interfaces/IGovernanceGenesisToken.sol";
 import "../types/ERC20.sol";
 
-contract GovernanceGenesisToken is IgOHM, ERC20 {
+contract GovernanceGenesisToken is IGovernanceGenesisToken, ERC20 {
     /* ========== DEPENDENCIES ========== */
 
     using Address for address;
@@ -36,7 +36,7 @@ contract GovernanceGenesisToken is IgOHM, ERC20 {
 
     /* ========== STATE VARIABLES ========== */
 
-    IsOHM public sOHM;
+    IStakedGenesisToken public sOHM;
     address public minter;
     bool public migrated;
 
@@ -48,7 +48,7 @@ contract GovernanceGenesisToken is IgOHM, ERC20 {
 
     constructor(address _sOHM) ERC20("Governance GEN", "gGEN", 18) {
         require(_sOHM != address(0), "Zero address: sOHM");
-        sOHM = IsOHM(_sOHM);
+        sOHM = IStakedGenesisToken(_sOHM);
     }
 
 	function initialize(address _minter) public {

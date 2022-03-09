@@ -4,19 +4,19 @@ pragma solidity ^0.7.5;
 import "./libraries/SafeMath.sol";
 
 import "./interfaces/IERC20.sol";
-import "./interfaces/IOHM.sol";
+import "./interfaces/IGenesisToken.sol";
 import "./interfaces/IERC20Permit.sol";
 
 import "./types/ERC20Permit.sol";
-import "./types/OlympusAccessControlled.sol";
+import "./types/AccessControlled.sol";
 
-contract GenesisToken is ERC20Permit, IOHM, OlympusAccessControlled {
+contract GenesisToken is ERC20Permit, IGenesisToken, AccessControlled {
     using SafeMath for uint256;
 
     constructor(address _authority)
     	ERC20("Genesis", "GEN", 9)
     	ERC20Permit("Genesis")
-    	OlympusAccessControlled(IOlympusAuthority(_authority))
+    	AccessControlled(IAuthority(_authority))
 	{}
 
     function mint(address account_, uint256 amount_) external override onlyVault {

@@ -38,9 +38,9 @@ contract BondDepository is IBondDepository, NoteKeeper {
     /* ======== CONSTRUCTOR ======== */
 
     constructor(
-        IOlympusAuthority _authority,
+        IAuthority _authority,
         IERC20 _ohm,
-        IgOHM _gohm,
+        IGovernanceGenesisToken _gohm,
         IStaking _staking,
         ITreasury _treasury
     ) NoteKeeper(_authority, _ohm, _gohm, _staking, _treasury) {

@@ -6,11 +6,11 @@ import "./libraries/SafeMath.sol";
 
 import "./types/ERC20Permit.sol";
 
-import "./interfaces/IgOHM.sol";
-import "./interfaces/IsOHM.sol";
+import "./interfaces/IGovernanceGenesisToken.sol";
+import "./interfaces/IStakedGenesisToken.sol";
 import "./interfaces/IStaking.sol";
 
-contract StakedGenesisToken is IsOHM, ERC20Permit {
+contract StakedGenesisToken is IStakedGenesisToken, ERC20Permit {
     /* ========== DEPENDENCIES ========== */
 
     using SafeMath for uint256;
@@ -47,7 +47,7 @@ contract StakedGenesisToken is IsOHM, ERC20Permit {
     uint256 internal INDEX; // Index Gons - tracks rebase growth
 
     address public stakingContract; // balance used to calc rebase
-    IgOHM public gOHM; // additional staked supply (governance token)
+    IGovernanceGenesisToken public gOHM; // additional staked supply (governance token)
 
     Rebase[] public rebases; // past rebase data
 
@@ -71,8 +71,8 @@ contract StakedGenesisToken is IsOHM, ERC20Permit {
 
     /* ========== CONSTRUCTOR ========== */
 
-    constructor() ERC20("Staked GEN", "sGEN", 9) ERC20Permit("Staked GEN") {
-        initializer = msg.sender;
+    constructor(address _initializer) ERC20("Staked GEN", "sGEN", 9) ERC20Permit("Staked GEN") {
+        initializer = _initializer;
         _totalSupply = INITIAL_FRAGMENTS_SUPPLY;
         _gonsPerFragment = TOTAL_GONS.div(_totalSupply);
     }
@@ -89,7 +89,7 @@ contract StakedGenesisToken is IsOHM, ERC20Permit {
         require(msg.sender == initializer, "Initializer:  caller is not initializer");
         require(address(gOHM) == address(0), "gOHM:  gOHM already set");
         require(_gOHM != address(0), "gOHM:  gOHM is not a valid contract");
-        gOHM = IgOHM(_gOHM);
+        gOHM = IGovernanceGenesisToken(_gOHM);
     }
 
     // do this last

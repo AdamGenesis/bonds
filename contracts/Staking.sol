@@ -5,19 +5,19 @@ import "./libraries/SafeMath.sol";
 import "./libraries/SafeERC20.sol";
 
 import "./interfaces/IERC20.sol";
-import "./interfaces/IsOHM.sol";
-import "./interfaces/IgOHM.sol";
+import "./interfaces/IStakedGenesisToken.sol";
+import "./interfaces/IGovernanceGenesisToken.sol";
 import "./interfaces/IDistributor.sol";
 
-import "./types/OlympusAccessControlled.sol";
+import "./types/AccessControlled.sol";
 
-contract Staking is OlympusAccessControlled {
+contract Staking is AccessControlled {
     /* ========== DEPENDENCIES ========== */
 
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
-    using SafeERC20 for IsOHM;
-    using SafeERC20 for IgOHM;
+    using SafeERC20 for IStakedGenesisToken;
+    using SafeERC20 for IGovernanceGenesisToken;
 
     /* ========== EVENTS ========== */
 
@@ -43,8 +43,8 @@ contract Staking is OlympusAccessControlled {
     /* ========== STATE VARIABLES ========== */
 
     IERC20 public immutable OHM;
-    IsOHM public immutable sOHM;
-    IgOHM public immutable gOHM;
+    IStakedGenesisToken public immutable sOHM;
+    IGovernanceGenesisToken public immutable gOHM;
 
     Epoch public epoch;
 
@@ -64,13 +64,13 @@ contract Staking is OlympusAccessControlled {
         uint256 _firstEpochNumber,
         uint256 _firstEpochTime,
         address _authority
-    ) OlympusAccessControlled(IOlympusAuthority(_authority)) {
+    ) AccessControlled(IAuthority(_authority)) {
         require(_ohm != address(0), "Zero address: OHM");
         OHM = IERC20(_ohm);
         require(_sOHM != address(0), "Zero address: sOHM");
-        sOHM = IsOHM(_sOHM);
+        sOHM = IStakedGenesisToken(_sOHM);
         require(_gOHM != address(0), "Zero address: gOHM");
-        gOHM = IgOHM(_gOHM);
+        gOHM = IGovernanceGenesisToken(_gOHM);
 
         epoch = Epoch({length: _epochLength, number: _firstEpochNumber, end: _firstEpochTime, distribute: 0});
     }
