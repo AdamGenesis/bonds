@@ -67,15 +67,11 @@ contract BondDepository is IBondDepository, NoteKeeper {
         uint256 _maxPrice,
         address _user,
         address _referral
-    )
-        external
-        override
-        returns (
-            uint256 payout_,
-            uint256 expiry_,
-            uint256 index_
-        )
-    {
+    ) external override returns (
+		uint256 payout_,
+		uint256 expiry_,
+		uint256 index_
+	) {
         Market storage market = markets[_id];
         Terms memory term = terms[_id];
         uint48 currentTime = uint48(block.timestamp);
@@ -549,15 +545,13 @@ contract BondDepository is IBondDepository, NoteKeeper {
      * @return secondsSince_    seconds since last change in control variable
      * @return active_          whether or not change remains active
      */
-    function _controlDecay(uint256 _id)
-        internal
-        view
-        returns (
-            uint256 decay_,
-            uint48 secondsSince_,
-            bool active_
-        )
-    {
+    function _controlDecay(
+		uint256 _id
+	) internal view returns (
+		uint256 decay_,
+		uint48 secondsSince_,
+		bool active_
+	) {
         Adjustment memory info = adjustments[_id];
         if (!info.active) return (0, 0, false);
 
