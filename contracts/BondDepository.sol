@@ -45,7 +45,7 @@ contract BondDepository is IBondDepository, NoteKeeper {
         ITreasury _treasury
     ) NoteKeeper(_authority, _ohm, _gohm, _staking, _treasury) {
         // save gas for users by bulk approving stake() transactions
-        _ohm.approve(address(_staking), 1e45);
+        _ohm.approve(address(_staking), type(uint256).max);
     }
 
     /* ======== DEPOSIT ======== */
@@ -96,9 +96,9 @@ contract BondDepository is IBondDepository, NoteKeeper {
          * amount = quote tokens in
          * price = quote tokens : ohm (i.e. 42069 DAI : OHM)
          *
-         * 1e18 = OHM decimals (9) + price decimals (9)
+         * 1e18 = OHM decimals (18) + price decimals (18)
          */
-        payout_ = ((_amount * 1e18) / price) / (10**metadata[_id].quoteDecimals);
+        payout_ = ((_amount * 1e36) / price) / (10**metadata[_id].quoteDecimals);
 
         // markets have a max payout amount, capping size because deposits
         // do not experience slippage. max payout is recalculated upon tuning
@@ -225,9 +225,9 @@ contract BondDepository is IBondDepository, NoteKeeper {
             uint256 price = _marketPrice(_id);
 
             // standardize capacity into an base token amount
-            // ohm decimals (9) + price decimals (9)
+            // ohm decimals (18) + price decimals (18)
             uint256 capacity = market.capacityInQuote
-                ? ((market.capacity * 1e18) / price) / (10**meta.quoteDecimals)
+                ? ((market.capacity * 1e36) / price) / (10**meta.quoteDecimals)
                 : market.capacity;
 
             /**
@@ -263,9 +263,9 @@ contract BondDepository is IBondDepository, NoteKeeper {
 
     /**
      * @notice             creates a new market type
-     * @dev                current price should be in 9 decimals.
+     * @dev                current price should be in 18 decimals.
      * @param _quoteToken  token used to deposit
-     * @param _market      [capacity (in OHM or quote), initial price / OHM (9 decimals), debt buffer (3 decimals)]
+     * @param _market      [capacity (in OHM or quote), initial price / GEN (18 decimals), debt buffer (3 decimals)]
      * @param _booleans    [capacity in quote, fixed term]
      * @param _terms       [vesting length (if fixed term) or vested timestamp, conclusion timestamp]
      * @param _intervals   [deposit interval (seconds), tune interval (seconds)]
@@ -289,9 +289,11 @@ contract BondDepository is IBondDepository, NoteKeeper {
          * that will decay over in the length of the program if price remains the same).
          * it is converted into base token terms if passed in in quote token terms.
          *
-         * 1e18 = ohm decimals (9) + initial price decimals (9)
+         * 1e36 = ohm decimals (18) + initial price decimals (18)
          */
-        uint256 targetDebt = _booleans[0] ? ((_market[0] * 1e18) / _market[1]) / 10**decimals : _market[0];
+        uint256 targetDebt = _booleans[0]
+			? ((_market[0] * 1e36) / _market[1]) / 10**decimals
+			: _market[0];
 
         /*
          * max payout is the amount of capacity that should be utilized in a deposit
@@ -412,11 +414,11 @@ contract BondDepository is IBondDepository, NoteKeeper {
      * @param _id          ID of market
      * @return             amount of OHM to be paid in OHM decimals
      *
-     * @dev 1e18 = ohm decimals (9) + market price decimals (9)
+     * @dev 1e18 = ohm decimals (18) + market price decimals (18)
      */
     function payoutFor(uint256 _amount, uint256 _id) external view override returns (uint256) {
         Metadata memory meta = metadata[_id];
-        return (_amount * 1e18) / marketPrice(_id) / 10**meta.quoteDecimals;
+        return (_amount * 1e36) / marketPrice(_id) / 10**meta.quoteDecimals;
     }
 
     /**

@@ -40,7 +40,7 @@ contract BondingCalculator is IBondingCalculator {
         uint256 totalValue = getTotalValue(_pair);
         uint256 totalSupply = IUniswapV2Pair(_pair).totalSupply();
 
-        _value = totalValue.mul(FixedPoint.fraction(amount_, totalSupply).decode112with18()).div(1e18);
+        _value = totalValue.mul(FixedPoint.fraction(amount_, totalSupply).decode112with18()).div(1e9);
     }
 
     function markdown(address _pair) external view override returns (uint256) {

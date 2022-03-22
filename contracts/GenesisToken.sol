@@ -14,7 +14,7 @@ contract GenesisToken is ERC20Permit, IGenesisToken, AccessControlled {
     using SafeMath for uint256;
 
     constructor(address _authority)
-    	ERC20("Genesis", "GEN", 9)
+    	ERC20("Genesis", "GEN", 18)
     	ERC20Permit("Genesis")
     	AccessControlled(IAuthority(_authority))
 	{}

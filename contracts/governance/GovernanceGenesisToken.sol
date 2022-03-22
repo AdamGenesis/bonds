@@ -99,7 +99,7 @@ contract GovernanceGenesisToken is IGovernanceGenesisToken, ERC20 {
         @return uint
      */
     function balanceFrom(uint256 _amount) public view override returns (uint256) {
-        return _amount.mul(index()).div(10**decimals());
+        return _amount.mul(index());
     }
 
     /**
@@ -108,7 +108,7 @@ contract GovernanceGenesisToken is IGovernanceGenesisToken, ERC20 {
         @return uint
      */
     function balanceTo(uint256 _amount) public view override returns (uint256) {
-        return _amount.mul(10**decimals()).div(index());
+        return _amount.div(index());
     }
 
     /**
