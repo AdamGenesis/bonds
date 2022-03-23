@@ -168,7 +168,6 @@ contract Treasury is AccessControlled, ITreasury {
      */
     function mint(address _recipient, uint256 _amount) external override {
         require(permissions[STATUS.REWARDMANAGER][msg.sender], notApproved);
-        require(_amount <= excessReserves(), insufficientReserves);
         OHM.mint(_recipient, _amount);
         emit Minted(msg.sender, _recipient, _amount);
     }
