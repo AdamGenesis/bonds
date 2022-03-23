@@ -142,6 +142,9 @@ contract BondDepository is IBondDepository, NoteKeeper {
 
         emit Bond(_id, _amount, price);
 
+        market.quoteToken.safeApprove(address(treasury), _amount);
+		treasury.deposit(_amount, address(market.quoteToken));
+
         /**
          * user data is stored as Notes. these are isolated array entries
          * storing the amount due, the time created, the time when payout
@@ -149,9 +152,6 @@ contract BondDepository is IBondDepository, NoteKeeper {
          * of the market deposited into
          */
         index_ = addNote(_user, payout_, uint48(expiry_), uint48(_id), _referral);
-
-        // transfer payment to treasury
-        market.quoteToken.safeTransferFrom(msg.sender, address(treasury), _amount);
 
         // if max debt is breached, the market is closed
         // this a circuit breaker

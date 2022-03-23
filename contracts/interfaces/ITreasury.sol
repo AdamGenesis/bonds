@@ -2,11 +2,7 @@
 pragma solidity >=0.7.5;
 
 interface ITreasury {
-    function deposit(
-        uint256 _amount,
-        address _token,
-        uint256 _profit
-    ) external returns (uint256);
+    function deposit(uint256 _amount, address _token) external;
 
     function withdraw(uint256 _amount, address _token) external;
 

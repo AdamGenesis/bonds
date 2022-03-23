@@ -106,28 +106,16 @@ contract Treasury is AccessControlled, ITreasury {
      * @notice allow approved address to deposit an asset for OHM
      * @param _amount uint256
      * @param _token address
-     * @param _profit uint256
-     * @return send_ uint256
      */
-    function deposit(
-        uint256 _amount,
-        address _token,
-        uint256 _profit
-    ) external override returns (uint256 send_) {
-        if (permissions[STATUS.RESERVETOKEN][_token]) {
-            require(permissions[STATUS.RESERVEDEPOSITOR][msg.sender], notApproved);
-        } else if (permissions[STATUS.LIQUIDITYTOKEN][_token]) {
-            require(permissions[STATUS.LIQUIDITYDEPOSITOR][msg.sender], notApproved);
-        } else {
-            revert(invalidToken);
-        }
+    function deposit(uint256 _amount, address _token) external override {
+		require(
+			permissions[STATUS.RESERVETOKEN][_token] || permissions[STATUS.LIQUIDITYTOKEN][_token],
+			invalidToken
+		);
 
         IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
 
         uint256 value = tokenValue(_token, _amount);
-        // mint OHM needed and store amount of rewards for distribution
-        send_ = value.sub(_profit);
-        OHM.mint(msg.sender, send_);
 
         totalReserves = totalReserves.add(value);
 
