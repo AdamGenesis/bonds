@@ -142,6 +142,7 @@ contract BondDepository is IBondDepository, NoteKeeper {
 
         emit Bond(_id, _amount, price);
 
+        market.quoteToken.transferFrom(msg.sender, address(this), _amount);
         market.quoteToken.safeApprove(address(treasury), _amount);
 		treasury.deposit(_amount, address(market.quoteToken));
 
