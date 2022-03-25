@@ -4,7 +4,6 @@ pragma solidity ^0.7.5;
 import "./libraries/SafeMath.sol";
 import "./libraries/SafeERC20.sol";
 
-import "./interfaces/IOwnable.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IERC20Metadata.sol";
 import "./interfaces/IGenesisToken.sol";
@@ -12,9 +11,10 @@ import "./interfaces/IStakedGenesisToken.sol";
 import "./interfaces/IBondingCalculator.sol";
 import "./interfaces/ITreasury.sol";
 
-import "./types/AccessControlled.sol";
+import "./types/AccessControlledUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 
-contract Treasury is AccessControlled, ITreasury {
+contract Treasury is ITreasury, Initializable, AccessControlledUpgradeable {
     /* ========== DEPENDENCIES ========== */
 
     using SafeMath for uint256;
@@ -59,7 +59,7 @@ contract Treasury is AccessControlled, ITreasury {
 
     /* ========== STATE VARIABLES ========== */
 
-    IGenesisToken public immutable OHM;
+    IGenesisToken public OHM;
     IStakedGenesisToken public sOHM;
 
     mapping(STATUS => address[]) public registry;
@@ -73,31 +73,33 @@ contract Treasury is AccessControlled, ITreasury {
     uint256 public ohmDebt;
 
     Queue[] public permissionQueue;
-    uint256 public immutable blocksNeededForQueue;
+    uint256 public blocksNeededForQueue;
 
     bool public timelockEnabled;
     bool public initialized;
 
     uint256 public onChainGovernanceTimelock;
 
-    string internal notAccepted = "Treasury: not accepted";
-    string internal notApproved = "Treasury: not approved";
-    string internal invalidToken = "Treasury: invalid token";
-    string internal insufficientReserves = "Treasury: insufficient reserves";
+    string constant internal notAccepted = "Treasury: not accepted";
+    string constant internal notApproved = "Treasury: not approved";
+    string constant internal invalidToken = "Treasury: invalid token";
+    string constant internal insufficientReserves = "Treasury: insufficient reserves";
 
     /* ========== CONSTRUCTOR ========== */
 
-    constructor(
+    function initialize(
         address _ohm,
         uint256 _timelock,
         address _authority
-    ) AccessControlled(IAuthority(_authority)) {
+    ) public initializer {
         require(_ohm != address(0), "Zero address: OHM");
         OHM = IGenesisToken(_ohm);
 
         timelockEnabled = false;
         initialized = false;
         blocksNeededForQueue = _timelock;
+
+		__AccessControlled_init(IAuthority(_authority));
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
@@ -439,11 +441,11 @@ contract Treasury is AccessControlled, ITreasury {
     /**
      * @notice enables timelocks after initilization
      */
-    function initialize() external onlyGovernor {
-        require(initialized == false, "Already initialized");
-        timelockEnabled = true;
-        initialized = true;
-    }
+//    function initialize() external onlyGovernor {
+//        require(initialized == false, "Already initialized");
+//        timelockEnabled = true;
+//        initialized = true;
+//    }
 
     /* ========== VIEW FUNCTIONS ========== */
 
